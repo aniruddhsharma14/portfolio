@@ -575,7 +575,7 @@
 <!-- ── Stats ── -->
 <div class="stats-row">
   <div class="stat">
-    <div class="stat-val">5</div>
+    <div class="stat-val">4</div>
     <div class="stat-label">Projects</div>
   </div>
   <div class="stat">
@@ -626,30 +626,33 @@
       </div>
     </a>
 
-    <!-- Limit Order Book -->
-    <a href="limit order book matching engine/" class="project-card card-green">
+    <!-- Limit Order Book Fraud Detection -->
+    <a href="Limit Order Book Fraud Detection/anomaly_dashboard.html" class="project-card card-red">
       <div class="project-header">
-        <div class="project-icon icon-green">📒</div>
+        <div class="project-icon icon-red">🔬</div>
         <span class="project-arrow">↗</span>
       </div>
-      <div class="project-name">Limit Order Book Matching Engine</div>
+      <div class="project-name">Order Flow Anomaly Detection</div>
       <p class="project-desc">
-        A high-performance order book matching engine implementing price-time priority. Supports
-        limit and market orders, partial fills, and real-time mid-price and spread calculations.
+        Deep autoencoder trained on 15 limit order book signals — bid/ask returns, queue sizes,
+        trade and cancellation indicators. Reconstruction error flags anomalous order flow without
+        any labels: the model learns what "normal" looks like and surfaces everything that doesn't
+        compress cleanly.
       </p>
       <div class="project-tags">
+        <span class="tag">PyTorch</span>
+        <span class="tag">Autoencoder</span>
+        <span class="tag">LOB Data</span>
         <span class="tag">Market Microstructure</span>
-        <span class="tag">Order Book</span>
-        <span class="tag">Python</span>
       </div>
       <div class="project-meta">
-        <span>Price-time priority · partial fills</span>
-        <span>2024</span>
+        <span>15→4 bottleneck · unsupervised anomaly scoring</span>
+        <span>2025</span>
       </div>
     </a>
 
     <!-- Twitter Sentiment -->
-    <a href="Twitter_Sentiment_Analysis.ipynb" class="project-card card-blue">
+    <a href="Twitter Sentiment Analysis/" class="project-card card-blue">
       <div class="project-header">
         <div class="project-icon icon-blue">🐦</div>
         <span class="project-arrow">↗</span>
@@ -672,7 +675,7 @@
     </a>
 
     <!-- Unsupervised ML Trading -->
-    <a href="Unsupervised_Machine_Learning_Trading_S..." class="project-card card-purple">
+    <a href="Unsupervised ML Trading Strategy/" class="project-card card-purple">
       <div class="project-header">
         <div class="project-icon icon-purple">🤖</div>
         <span class="project-arrow">↗</span>
@@ -690,31 +693,6 @@
       <div class="project-meta">
         <span>Regime detection · equity markets</span>
         <span>2022</span>
-      </div>
-    </a>
-
-    <!-- Order Flow Anomaly Detection -->
-    <a href="anomaly-detection/anomaly_dashboard.html" class="project-card card-red">
-      <div class="project-header">
-        <div class="project-icon icon-red">🔬</div>
-        <span class="project-arrow">↗</span>
-      </div>
-      <div class="project-name">Order Flow Anomaly Detection</div>
-      <p class="project-desc">
-        Deep autoencoder trained on 15 limit order book signals — bid/ask returns, queue sizes,
-        trade and cancellation indicators. Reconstruction error flags anomalous order flow without
-        any labels: the model learns what "normal" looks like and surfaces everything that doesn't
-        compress cleanly.
-      </p>
-      <div class="project-tags">
-        <span class="tag">PyTorch</span>
-        <span class="tag">Autoencoder</span>
-        <span class="tag">LOB Data</span>
-        <span class="tag">Market Microstructure</span>
-      </div>
-      <div class="project-meta">
-        <span>15→4 bottleneck · unsupervised anomaly scoring</span>
-        <span>2025</span>
       </div>
     </a>
 
