@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aniruddh Sharma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #f7f5f0;
+    --bg2:      #efede7;
+    --bg3:      #e6e3da;
+    --border:   rgba(0,0,0,0.08);
+    --border2:  rgba(0,0,0,0.14);
+    --text:     #1a1916;
+    --text2:    #6b6860;
+    --text3:    #a8a59e;
+    --ink:      #2c2a26;
+    --amber:    #b8601a;
+    --amber-bg: rgba(184,96,26,0.08);
+    --green:    #2d6e47;
+    --green-bg: rgba(45,110,71,0.08);
+    --blue:     #1e4f8c;
+    --blue-bg:  rgba(30,79,140,0.08);
+    --purple:   #5c3d8f;
+    --purple-bg:rgba(92,61,143,0.08);
+    --red:      #a02525;
+    --radius:   10px;
+    --radius-lg:16px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  /* ── Nav ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(247,245,240,0.88);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 56px;
+    height: 58px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .nav-name {
+    font-family: 'Lora', serif;
+    font-size: 16px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+
+  .nav-links { display: flex; gap: 28px; }
+
+  .nav-links a {
+    font-size: 13px;
+    color: var(--text2);
+    text-decoration: none;
+    transition: color 0.15s;
+    font-weight: 400;
+  }
+
+  .nav-links a:hover { color: var(--ink); }
+
+  /* ── Hero ── */
+  .hero {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 80px 56px 72px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .hero-left {}
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--amber);
+    background: var(--amber-bg);
+    border: 1px solid rgba(184,96,26,0.18);
+    border-radius: 20px;
+    padding: 4px 12px;
+    margin-bottom: 22px;
+  }
+
+  .hero-tag::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--amber);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+  }
+
+  .hero h1 {
+    font-family: 'Lora', serif;
+    font-size: clamp(34px, 4.5vw, 52px);
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+
+  .hero-quip {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: clamp(17px, 2vw, 20px);
+    color: var(--text2);
+    margin-bottom: 22px;
+    line-height: 1.5;
+  }
+
+  .hero-desc {
+    font-size: 15px;
+    color: var(--text2);
+    max-width: 480px;
+    line-height: 1.75;
+    margin-bottom: 32px;
+  }
+
+  .hero-links { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 20px;
+    border-radius: var(--radius);
+    font-size: 13px; font-weight: 500;
+    text-decoration: none;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+  }
+
+  .btn-primary {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+
+  .btn-primary:hover { background: #3d3a34; }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text2);
+    border-color: var(--border2);
+  }
+
+  .btn-outline:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* ── Photo ── */
+  .hero-photo-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .hero-photo {
+    width: 220px; height: 260px;
+    border-radius: var(--radius-lg);
+    object-fit: cover;
+    display: block;
+    border: 1px solid var(--border2);
+  }
+
+  /* Placeholder shown when no real photo */
+  .hero-photo-placeholder {
+    width: 220px; height: 260px;
+    border-radius: var(--radius-lg);
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--text3);
+    font-size: 13px;
+  }
+
+  .photo-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--bg2);
+    border: 1px dashed var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+
+  /* Decorative dot grid behind photo */
+  .hero-photo-wrap::before {
+    content: '';
+    position: absolute;
+    bottom: -14px; right: -14px;
+    width: 100px; height: 100px;
+    background-image: radial-gradient(circle, var(--border2) 1.5px, transparent 1.5px);
+    background-size: 12px 12px;
+    border-radius: 8px;
+    z-index: -1;
+  }
+
+  /* ── Stats row ── */
+  .stats-row {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .stat {
+    flex: 1;
+    padding: 24px 56px;
+    border-right: 1px solid var(--border);
+  }
+
+  .stat:last-child { border-right: none; }
+
+  .stat-val {
+    font-family: 'Lora', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* ── Section ── */
+  .section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 64px 56px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 32px;
+  }
+
+  .section-title {
+    font-family: 'Lora', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+
+  .section-note {
+    font-size: 13px;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── Project cards ── */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .project-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .project-card:hover {
+    border-color: var(--border2);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    transform: translateY(-2px);
+  }
+
+  .project-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .card-amber::before  { background: var(--amber); }
+  .card-green::before  { background: var(--green); }
+  .card-blue::before   { background: var(--blue); }
+  .card-purple::before { background: var(--purple); }
+
+  .project-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .project-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .icon-amber  { background: var(--amber-bg); }
+  .icon-green  { background: var(--green-bg); }
+  .icon-blue   { background: var(--blue-bg); }
+  .icon-purple { background: var(--purple-bg); }
+
+  .project-arrow {
+    font-size: 18px;
+    color: var(--text3);
+    transition: color 0.15s, transform 0.15s;
+  }
+
+  .project-card:hover .project-arrow {
+    color: var(--ink);
+    transform: translate(2px, -2px);
+  }
+
+  .project-name {
+    font-family: 'Lora', serif;
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.3;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .project-desc {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.65;
+    flex: 1;
+    margin-bottom: 18px;
+  }
+
+  .project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    padding: 3px 9px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--text3);
+    background: var(--bg);
+  }
+
+  .project-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .coming-soon {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .coming-soon-badge {
+    position: absolute;
+    top: 18px; right: 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--bg2);
+    color: var(--text3);
+    border: 1px solid var(--border);
+  }
+
+  /* ── About strip ── */
+  .about-strip {
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .about-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 56px 56px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
+    align-items: start;
+  }
+
+  .about-title {
+    font-family: 'Lora', serif;
+    font-size: 28px;
+    font-weight: 400;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+    color: #f0ece3;
+  }
+
+  .about-body {
+    font-size: 14px;
+    line-height: 1.8;
+    color: rgba(247,245,240,0.65);
+  }
+
+  .about-body p { margin-bottom: 12px; }
+  .about-body p:last-child { margin-bottom: 0; }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .skill-item {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+  }
+
+  .skill-cat {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(247,245,240,0.35);
+    margin-bottom: 5px;
+  }
+
+  .skill-list {
+    font-size: 12px;
+    color: rgba(247,245,240,0.7);
+    line-height: 1.6;
+  }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 100%;
+    font-size: 12px;
+    color: var(--text3);
+  }
+
+  footer a {
+    color: var(--text2);
+    text-decoration: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    transition: color 0.15s;
+  }
+
+  footer a:hover { color: var(--ink); }
+
+  .footer-links { display: flex; gap: 20px; }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero        { animation: fadeUp 0.55s ease both; }
+  .stats-row   { animation: fadeUp 0.55s 0.1s ease both; }
+  .section     { animation: fadeUp 0.55s 0.15s ease both; }
+
+  /* ── Responsive ── */
+  @media (max-width: 860px) {
+    nav, footer { padding-left: 24px; padding-right: 24px; }
+    .hero { grid-template-columns: 1fr; padding: 48px 24px; gap: 36px; }
+    .hero-photo-wrap { order: -1; }
+    .hero-photo, .hero-photo-placeholder { width: 100%; height: 220px; }
+    .stats-row { flex-wrap: wrap; }
+    .stat { flex: 0 0 50%; border-right: none; border-bottom: 1px solid var(--border); padding: 20px 24px; }
+    .section { padding: 48px 24px; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .about-inner { grid-template-columns: 1fr; padding: 40px 24px; gap: 32px; }
+    .skills-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<nav>
+  <span class="nav-name">Aniruddh Sharma</span>
+  <div class="nav-links">
+    <a href="#projects">Projects</a>
+    <a href="#about">About</a>
+    <a href="https://github.com/aniruddhsharma14" target="_blank">GitHub ↗</a>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-tag">Open to opportunities</div>
+    <h1>Aniruddh Sharma</h1>
+    <p class="hero-quip">Wanted to be an astronaut.<br>Ended up being interested in the markets.</p>
+    <p class="hero-desc">
+      I build quantitative tools at the intersection of machine learning and financial markets —
+      from alternative data pipelines to order book engines. Currently exploring how messy
+      real-world data can sharpen market predictions.
+    </p>
+    <div class="hero-links">
+      <a href="#projects" class="btn btn-primary">View projects</a>
+      <a href="https://github.com/aniruddhsharma14" target="_blank" class="btn btn-outline">GitHub ↗</a>
+      <a href="mailto:aniruddh@example.com" class="btn btn-outline">Contact</a>
+    </div>
+  </div>
+
+  <div class="hero-photo-wrap">
+    <!--
+      TO ADD YOUR PHOTO:
+      1. Add your photo file to the repo root (e.g. photo.jpg)
+      2. Replace the placeholder div below with:
+         <img src="photo.jpg" alt="Aniruddh Sharma" class="hero-photo">
+    -->
+    <div class="hero-photo-placeholder">
+      <div class="photo-icon">👤</div>
+      <span>photo.jpg</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── Stats ── -->
+<div class="stats-row">
+  <div class="stat">
+    <div class="stat-val">4</div>
+    <div class="stat-label">Projects</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val">3</div>
+    <div class="stat-label">Data sources merged</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val">22 yrs</div>
+    <div class="stat-label">Backtested history</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val">0.71</div>
+    <div class="stat-label">Best OOS R²</div>
+  </div>
+</div>
+
+<!-- ── Projects ── -->
+<section class="section" id="projects">
+  <div class="section-header">
+    <h2 class="section-title">Projects</h2>
+    <span class="section-note">more coming soon</span>
+  </div>
+
+  <div class="projects-grid">
+
+    <!-- Agricultural Futures Prediction -->
+    <a href="Agricultural Futures Prediction/dashboard.html" class="project-card card-amber">
+      <div class="project-header">
+        <div class="project-icon icon-amber">🌽</div>
+        <span class="project-arrow">↗</span>
+      </div>
+      <div class="project-name">Agricultural Futures Prediction Pipeline</div>
+      <p class="project-desc">
+        Merges USDA crop condition reports, NOAA Palmer Drought Severity Index, and CBOT corn futures
+        to engineer novel cross-domain features. The drought × crop condition interaction term is the
+        single strongest predictor — invisible to price-only models.
+      </p>
+      <div class="project-tags">
+        <span class="tag">XGBoost</span>
+        <span class="tag">SHAP</span>
+        <span class="tag">Alternative Data</span>
+        <span class="tag">USDA NASS</span>
+        <span class="tag">NOAA PDSI</span>
+      </div>
+      <div class="project-meta">
+        <span>OOS R² 0.71 · 58.3% direction accuracy</span>
+        <span>2024</span>
+      </div>
+    </a>
+
+    <!-- Limit Order Book -->
+    <a href="limit order book matching engine/" class="project-card card-green">
+      <div class="project-header">
+        <div class="project-icon icon-green">📒</div>
+        <span class="project-arrow">↗</span>
+      </div>
+      <div class="project-name">Limit Order Book Matching Engine</div>
+      <p class="project-desc">
+        A high-performance order book matching engine implementing price-time priority. Supports
+        limit and market orders, partial fills, and real-time mid-price and spread calculations.
+      </p>
+      <div class="project-tags">
+        <span class="tag">Market Microstructure</span>
+        <span class="tag">Order Book</span>
+        <span class="tag">Python</span>
+      </div>
+      <div class="project-meta">
+        <span>Price-time priority · partial fills</span>
+        <span>2024</span>
+      </div>
+    </a>
+
+    <!-- Twitter Sentiment -->
+    <a href="Twitter_Sentiment_Analysis.ipynb" class="project-card card-blue">
+      <div class="project-header">
+        <div class="project-icon icon-blue">🐦</div>
+        <span class="project-arrow">↗</span>
+      </div>
+      <div class="project-name">Twitter Sentiment Analysis</div>
+      <p class="project-desc">
+        NLP pipeline that classifies market-relevant tweets and explores the relationship between
+        retail sentiment and short-term price movements in equities.
+      </p>
+      <div class="project-tags">
+        <span class="tag">NLP</span>
+        <span class="tag">Sentiment</span>
+        <span class="tag">Python</span>
+        <span class="tag">Jupyter</span>
+      </div>
+      <div class="project-meta">
+        <span>NLP · sentiment signals</span>
+        <span>2022</span>
+      </div>
+    </a>
+
+    <!-- Unsupervised ML Trading -->
+    <a href="Unsupervised_Machine_Learning_Trading_S..." class="project-card card-purple">
+      <div class="project-header">
+        <div class="project-icon icon-purple">🤖</div>
+        <span class="project-arrow">↗</span>
+      </div>
+      <div class="project-name">Unsupervised ML Trading Strategy</div>
+      <p class="project-desc">
+        Applies clustering and dimensionality reduction techniques to identify latent market regimes
+        and construct regime-conditional trading strategies across equity markets.
+      </p>
+      <div class="project-tags">
+        <span class="tag">Clustering</span>
+        <span class="tag">Regime Detection</span>
+        <span class="tag">Unsupervised ML</span>
+      </div>
+      <div class="project-meta">
+        <span>Regime detection · equity markets</span>
+        <span>2022</span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- ── About ── -->
+<div class="about-strip" id="about">
+  <div class="about-inner">
+    <div>
+      <h2 class="about-title">About me</h2>
+      <div class="about-body">
+        <p>
+          I'm Aniruddh — a quantitative finance enthusiast who took a detour from childhood dreams
+          of space exploration and found something equally complex: financial markets.
+        </p>
+        <p>
+          My work sits at the intersection of machine learning and market structure. I'm particularly
+          drawn to alternative data — finding signals in places most people don't think to look,
+          whether that's USDA crop reports, satellite imagery, or social media.
+        </p>
+        <p>
+          This portfolio is a living record of that exploration. Projects here are built to learn,
+          not to trade. Nothing here is financial advice — just a person trying to understand
+          how the world prices things.
+        </p>
+      </div>
+    </div>
+    <div>
+      <div class="skills-grid">
+        <div class="skill-item">
+          <div class="skill-cat">Languages</div>
+          <div class="skill-list">Python · SQL · R</div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-cat">ML / Stats</div>
+          <div class="skill-list">XGBoost · scikit-learn · SHAP · statsmodels</div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-cat">Finance</div>
+          <div class="skill-list">Futures · Options · Market microstructure · Factor models</div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-cat">Data</div>
+          <div class="skill-list">Pandas · NumPy · Bloomberg · USDA · NOAA APIs</div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-cat">Tools</div>
+          <div class="skill-list">Git · Jupyter · VS Code</div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-cat">Interests</div>
+          <div class="skill-list">Alternative data · Commodity markets · NLP signals</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Footer ── -->
+<footer>
+  <span>© 2025 Aniruddh Sharma · Not financial advice.</span>
+  <div class="footer-links">
+    <a href="https://github.com/aniruddhsharma14" target="_blank">GitHub ↗</a>
+    <a href="mailto:aniruddh@example.com">Email</a>
+  </div>
+</footer>
+
+</body>
+</html>
