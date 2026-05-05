@@ -320,6 +320,7 @@
   .card-green::before  { background: var(--green); }
   .card-blue::before   { background: var(--blue); }
   .card-purple::before { background: var(--purple); }
+  .card-red::before    { background: #a02525; }
 
   .project-header {
     display: flex;
@@ -340,6 +341,7 @@
   .icon-green  { background: var(--green-bg); }
   .icon-blue   { background: var(--blue-bg); }
   .icon-purple { background: var(--purple-bg); }
+  .icon-red    { background: rgba(160,37,37,0.08); }
 
   .project-arrow {
     font-size: 18px;
@@ -546,16 +548,16 @@
   <div class="hero-left">
     <div class="hero-tag">Open to opportunities</div>
     <h1>Aniruddh Sharma</h1>
-    <p class="hero-quip">Wanted to be an astronaut.<br>Ended up being interested in the markets.</p>
+    <p class="hero-quip">Started with aeroplanes. Ended up in financial markets.<br>Turns out both are just complex systems you're trying not to crash :)</p>
     <p class="hero-desc">
-      I build quantitative tools at the intersection of machine learning and financial markets —
+      Building quantitative tools at the intersection of machine learning and financial markets —
       from alternative data pipelines to order book engines. Currently exploring how messy
       real-world data can sharpen market predictions.
     </p>
     <div class="hero-links">
       <a href="#projects" class="btn btn-primary">View projects</a>
       <a href="https://github.com/aniruddhsharma14" target="_blank" class="btn btn-outline">GitHub ↗</a>
-      <a href="mailto:aniruddh@example.com" class="btn btn-outline">Contact</a>
+      <a href="mailto:as22004@nyu.edu" class="btn btn-outline">Contact</a>
     </div>
   </div>
 
@@ -573,7 +575,7 @@
 <!-- ── Stats ── -->
 <div class="stats-row">
   <div class="stat">
-    <div class="stat-val">4</div>
+    <div class="stat-val">5</div>
     <div class="stat-label">Projects</div>
   </div>
   <div class="stat">
@@ -691,6 +693,31 @@
       </div>
     </a>
 
+    <!-- Order Flow Anomaly Detection -->
+    <a href="anomaly-detection/anomaly_dashboard.html" class="project-card card-red">
+      <div class="project-header">
+        <div class="project-icon icon-red">🔬</div>
+        <span class="project-arrow">↗</span>
+      </div>
+      <div class="project-name">Order Flow Anomaly Detection</div>
+      <p class="project-desc">
+        Deep autoencoder trained on 15 limit order book signals — bid/ask returns, queue sizes,
+        trade and cancellation indicators. Reconstruction error flags anomalous order flow without
+        any labels: the model learns what "normal" looks like and surfaces everything that doesn't
+        compress cleanly.
+      </p>
+      <div class="project-tags">
+        <span class="tag">PyTorch</span>
+        <span class="tag">Autoencoder</span>
+        <span class="tag">LOB Data</span>
+        <span class="tag">Market Microstructure</span>
+      </div>
+      <div class="project-meta">
+        <span>15→4 bottleneck · unsupervised anomaly scoring</span>
+        <span>2025</span>
+      </div>
+    </a>
+
   </div>
 </section>
 
@@ -752,7 +779,7 @@
   <span>© 2025 Aniruddh Sharma · Not financial advice.</span>
   <div class="footer-links">
     <a href="https://github.com/aniruddhsharma14" target="_blank">GitHub ↗</a>
-    <a href="mailto:aniruddh@example.com">Email</a>
+    <a href="mailto:as22004@nyu.edu">Email</a>
   </div>
 </footer>
 
