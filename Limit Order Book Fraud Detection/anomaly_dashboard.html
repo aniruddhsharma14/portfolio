@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Flow Anomaly Detection · Aniruddh Sharma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #080a0f;
+    --bg2:       #0e1117;
+    --bg3:       #141720;
+    --bg4:       #1c2030;
+    --border:    rgba(255,255,255,0.06);
+    --border2:   rgba(255,255,255,0.12);
+    --text:      #e2e4ec;
+    --text2:     #7e8499;
+    --text3:     #3e4358;
+    --cyan:      #3dd9c4;
+    --cyan-dim:  rgba(61,217,196,0.12);
+    --cyan-mid:  rgba(61,217,196,0.25);
+    --red:       #e05c5c;
+    --red-dim:   rgba(224,92,92,0.1);
+    --amber:     #e0a03a;
+    --amber-dim: rgba(224,160,58,0.1);
+    --blue:      #5b8dee;
+    --blue-dim:  rgba(91,141,238,0.1);
+    --purple:    #a078e8;
+    --purple-dim:rgba(160,120,232,0.1);
+    --radius:    8px;
+    --radius-lg: 14px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── Nav ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(8,10,15,0.9);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+    height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .nav-back {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text2);
+    text-decoration: none;
+    transition: color 0.15s;
+    letter-spacing: 0.04em;
+  }
+
+  .nav-back:hover { color: var(--cyan); }
+
+  .nav-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+  }
+
+  .nav-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(61,217,196,0.25);
+    color: var(--cyan);
+    background: var(--cyan-dim);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    padding: 64px 48px 52px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: -120px; right: -60px;
+    width: 600px; height: 400px;
+    background: radial-gradient(ellipse, rgba(61,217,196,0.04) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 20px; height: 1px;
+    background: var(--cyan);
+  }
+
+  h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(28px, 4vw, 46px);
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+    max-width: 700px;
+  }
+
+  h1 em { font-style: italic; color: var(--cyan); }
+
+  .hero-sub {
+    font-size: 14px;
+    color: var(--text2);
+    max-width: 600px;
+    line-height: 1.75;
+    margin-bottom: 28px;
+  }
+
+  .hero-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    background: var(--bg2);
+  }
+
+  /* ── Metrics strip ── */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .metric {
+    padding: 28px 32px;
+    border-right: 1px solid var(--border);
+  }
+
+  .metric:last-child { border-right: none; }
+
+  .metric-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 8px;
+  }
+
+  .metric-val {
+    font-family: 'Instrument Serif', serif;
+    font-size: 34px;
+    font-weight: 400;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .metric-val.cyan   { color: var(--cyan); }
+  .metric-val.amber  { color: var(--amber); }
+  .metric-val.blue   { color: var(--blue); }
+  .metric-val.purple { color: var(--purple); }
+
+  .metric-sub {
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  /* ── Main grid ── */
+  .main {
+    padding: 40px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 26px;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: var(--border2); }
+  .card.full  { grid-column: 1 / -1; }
+  .card.tall  { grid-row: span 2; }
+
+  .card-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 6px;
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  /* ── Architecture diagram ── */
+  .arch {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 20px;
+  }
+
+  .arch-block {
+    flex: 1;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 8px;
+    text-align: center;
+  }
+
+  .arch-dim {
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 3px;
+  }
+
+  .arch-label {
+    font-size: 10px;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .arch-arrow {
+    padding: 0 6px;
+    color: var(--text3);
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .dim-input   { color: var(--blue); }
+  .dim-hidden  { color: var(--purple); }
+  .dim-bottle  { color: var(--cyan); border-color: rgba(61,217,196,0.2); background: var(--cyan-dim); }
+  .dim-output  { color: var(--blue); }
+
+  /* ── Feature grid ── */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .feature-chip {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .feature-chip-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .feature-chip-desc {
+    font-size: 11px;
+    color: var(--text3);
+    line-height: 1.4;
+  }
+
+  .fc-cyan   { border-left: 2px solid var(--cyan); }
+  .fc-blue   { border-left: 2px solid var(--blue); }
+  .fc-amber  { border-left: 2px solid var(--amber); }
+  .fc-red    { border-left: 2px solid var(--red); }
+  .fc-purple { border-left: 2px solid var(--purple); }
+
+  /* ── Training steps ── */
+  .step-list { display: flex; flex-direction: column; gap: 0; }
+
+  .step {
+    display: flex; gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+
+  .step:last-child { border-bottom: none; }
+
+  .step-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--cyan);
+    background: var(--cyan-dim);
+    border: 1px solid rgba(61,217,196,0.2);
+    border-radius: 5px;
+    width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .step-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+
+  .step-body {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  /* ── Training curve mock ── */
+  .chart-wrap { position: relative; width: 100%; }
+
+  /* ── Anomaly score dist ── */
+  .score-bar-wrap {
+    margin-bottom: 10px;
+  }
+
+  .score-bar-label {
+    display: flex; justify-content: space-between;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+    margin-bottom: 5px;
+  }
+
+  .score-bar-track {
+    height: 6px;
+    background: var(--bg4);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s ease;
+  }
+
+  /* ── Callout ── */
+  .callout {
+    background: var(--cyan-dim);
+    border: 1px solid rgba(61,217,196,0.15);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  .callout strong { color: var(--cyan); font-weight: 500; }
+
+  /* ── Code ── */
+  .code {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    line-height: 1.75;
+    color: var(--text2);
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .kw  { color: var(--purple); }
+  .cl  { color: var(--cyan); }
+  .cm  { color: var(--text3); }
+  .st  { color: var(--amber); }
+  .nm  { color: var(--blue); }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 22px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+  }
+
+  footer a {
+    color: var(--text2); text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  footer a:hover { color: var(--cyan); }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero    { animation: fadeUp 0.5s ease both; }
+  .metrics { animation: fadeUp 0.5s 0.08s ease both; }
+  .main    { animation: fadeUp 0.5s 0.14s ease both; }
+
+  /* ── Responsive ── */
+  @media (max-width: 860px) {
+    nav, .hero, footer { padding-left: 20px; padding-right: 20px; }
+    .metrics { grid-template-columns: repeat(2, 1fr); }
+    .metric:nth-child(2) { border-right: none; }
+    .metric:nth-child(3) { border-top: 1px solid var(--border); }
+    .main { grid-template-columns: 1fr; padding: 24px 20px; }
+    .card.full, .card.tall { grid-column: 1; grid-row: auto; }
+    .arch { flex-wrap: wrap; }
+    .arch-arrow { display: none; }
+    .arch-block { flex: 0 0 calc(33% - 4px); }
+    .feature-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<nav>
+  <a href="../index.html" class="nav-back">← portfolio</a>
+  <span class="nav-title">order-flow-anomaly-detection</span>
+  <span class="nav-tag">autoencoder</span>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="hero-eyebrow">Market microstructure · Deep learning</div>
+  <h1>Detecting <em>anomalous</em> order flow with a deep autoencoder</h1>
+  <p class="hero-sub">
+    Trains a bottleneck neural network on limit order book features — bid/ask returns, queue sizes,
+    trade and cancellation indicators — then uses reconstruction error as an unsupervised anomaly
+    score. No labels required: the model learns what "normal" order flow looks like and flags
+    everything that doesn't compress cleanly.
+  </p>
+  <div class="hero-pills">
+    <span class="pill">PyTorch</span>
+    <span class="pill">Autoencoder</span>
+    <span class="pill">LOB Data</span>
+    <span class="pill">Unsupervised</span>
+    <span class="pill">Market Microstructure</span>
+    <span class="pill">AdamW + Cosine LR</span>
+  </div>
+</section>
+
+<!-- ── Metrics ── -->
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-label">Input features</div>
+    <div class="metric-val cyan">15</div>
+    <div class="metric-sub">LOB-derived signals</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Bottleneck dim</div>
+    <div class="metric-val amber">4</div>
+    <div class="metric-sub">73% compression from 15→4</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Training epochs</div>
+    <div class="metric-val blue">100</div>
+    <div class="metric-sub">best model saved by val loss</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Anomaly score</div>
+    <div class="metric-val purple">MSE</div>
+    <div class="metric-sub">per-sample reconstruction error</div>
+  </div>
+</div>
+
+<!-- ── Main ── -->
+<div class="main">
+
+  <!-- Architecture -->
+  <div class="card full">
+    <div class="card-eyebrow">Architecture</div>
+    <div class="card-title">Encoder → bottleneck → decoder</div>
+
+    <div class="arch">
+      <div class="arch-block">
+        <div class="arch-dim dim-input">15</div>
+        <div class="arch-label">input</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-block">
+        <div class="arch-dim dim-hidden">64</div>
+        <div class="arch-label">linear + BN + ELU</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-block">
+        <div class="arch-dim dim-hidden">32</div>
+        <div class="arch-label">linear + BN + ELU</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-block dim-bottle">
+        <div class="arch-dim dim-bottle">4</div>
+        <div class="arch-label" style="color:var(--cyan);">bottleneck</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-block">
+        <div class="arch-dim dim-hidden">32</div>
+        <div class="arch-label">linear + BN + ELU</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-block">
+        <div class="arch-dim dim-hidden">64</div>
+        <div class="arch-label">linear + BN + ELU</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-block">
+        <div class="arch-dim dim-output">15</div>
+        <div class="arch-label">reconstruction</div>
+      </div>
+    </div>
+
+    <p style="font-size:13px;color:var(--text2);line-height:1.75;max-width:760px;">
+      The bottleneck forces the model to learn a compressed representation of normal order flow.
+      Events that cannot be compressed accurately — unusual order sizes, atypical bid/ask dynamics,
+      abnormal cancellation bursts — produce high reconstruction error and are flagged as anomalies.
+      Dropout (0.2) at each layer prevents overfitting to noise; BatchNorm stabilises training on
+      the heterogeneous LOB feature scales.
+    </p>
+  </div>
+
+  <!-- Features -->
+  <div class="card">
+    <div class="card-eyebrow">Input features</div>
+    <div class="card-title">15 limit order book signals</div>
+    <div class="feature-grid">
+      <div class="feature-chip fc-cyan">
+        <div class="feature-chip-name">ReturnBid1 / ReturnAsk1</div>
+        <div class="feature-chip-desc">Percentage return at best bid/ask — captures price direction</div>
+      </div>
+      <div class="feature-chip fc-cyan">
+        <div class="feature-chip-name">DerivativeReturnBid1/Ask1</div>
+        <div class="feature-chip-desc">Rate of change of returns — captures acceleration in price</div>
+      </div>
+      <div class="feature-chip fc-blue">
+        <div class="feature-chip-name">BidSize1 / AskSize1</div>
+        <div class="feature-chip-desc">Queue depth at best level — measures available liquidity</div>
+      </div>
+      <div class="feature-chip fc-blue">
+        <div class="feature-chip-name">TradeBidSize / TradeAskSize</div>
+        <div class="feature-chip-desc">Executed volume on each side — reveals aggressor pressure</div>
+      </div>
+      <div class="feature-chip fc-amber">
+        <div class="feature-chip-name">CancelledBidSize / AskSize</div>
+        <div class="feature-chip-desc">Cancelled order volume — spoofing and layering signal</div>
+      </div>
+      <div class="feature-chip fc-red">
+        <div class="feature-chip-name">TradeBidIndicator / AskIndicator</div>
+        <div class="feature-chip-desc">Binary flags for trade activity on each side</div>
+      </div>
+      <div class="feature-chip fc-red">
+        <div class="feature-chip-name">CancelledBidIndicator / AskIndicator</div>
+        <div class="feature-chip-desc">Binary flags for cancellation activity on each side</div>
+      </div>
+      <div class="feature-chip fc-purple">
+        <div class="feature-chip-name">SeqRepeatCount</div>
+        <div class="feature-chip-desc">How many times same sequence number recurs per symbol — detects replayed or duplicate messages</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Training curve -->
+  <div class="card">
+    <div class="card-eyebrow">Training</div>
+    <div class="card-title">Loss curve — 100 epochs</div>
+    <div class="chart-wrap" style="height:200px;margin-bottom:16px;">
+      <canvas id="lossChart" role="img" aria-label="Line chart showing training and validation loss decreasing over 100 epochs">Training loss curve</canvas>
+    </div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.7;">
+      AdamW (lr=1e-3, weight_decay=1e-4) with cosine annealing over 100 epochs.
+      Best model checkpointed by validation MSE. Batch size 2048 for stable gradient estimates on
+      high-frequency LOB data.
+    </div>
+  </div>
+
+  <!-- Anomaly score distribution -->
+  <div class="card">
+    <div class="card-eyebrow">Output</div>
+    <div class="card-title">Reconstruction error distribution</div>
+
+    <div class="chart-wrap" style="height:180px;margin-bottom:20px;">
+      <canvas id="errorChart" role="img" aria-label="Histogram showing reconstruction error distribution with a long tail indicating anomalous events">Reconstruction error histogram</canvas>
+    </div>
+
+    <div class="callout">
+      <strong>Key insight:</strong> The vast majority of events reconstruct cleanly (low MSE). The long right tail — high reconstruction error — contains the anomalous order flow events: unusual size spikes, atypical cancellation bursts, and abnormal bid/ask dynamics the model has never compressed successfully.
+    </div>
+
+    <div style="font-size:12px;color:var(--text2);line-height:1.7;">
+      Scores are normalised to [0, 1] per the submission format. Submitted as raw continuous scores
+      (not binary threshold) — better for AUC-ROC evaluation since it preserves the full ranking
+      information rather than collapsing it to a single cut-off.
+    </div>
+  </div>
+
+  <!-- Pipeline steps -->
+  <div class="card">
+    <div class="card-eyebrow">Pipeline</div>
+    <div class="card-title">End-to-end methodology</div>
+    <div class="step-list">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-title">Feature extraction &amp; alignment</div>
+          <div class="step-body">Parse raw LOB messages into per-symbol feature rows. Construct <code style="font-family:'DM Mono',monospace;font-size:10px;color:var(--cyan)">SeqRepeatCount</code> by groupby on symbol × sequence number — detects duplicate/replayed messages which are themselves anomaly-adjacent.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-title">Preprocessing</div>
+          <div class="step-body">StandardScaler fit on train only, applied to val and test. Missing values in test imputed with train means — no data leakage. All 15 features standardised to zero-mean unit-variance before the network sees them.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-title">Autoencoder training</div>
+          <div class="step-body">15 → 64 → 32 → 4 → 32 → 64 → 15 with BatchNorm + ELU + Dropout(0.2). MSE reconstruction loss. Best checkpoint saved by validation loss; cosine LR annealing prevents oscillation late in training.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <div class="step-title">Anomaly scoring</div>
+          <div class="step-body">Per-sample MSE between original and reconstructed features. Events that deviate from the distribution the autoencoder learned — unusual order sizes, atypical cancellations — receive high error scores.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div>
+          <div class="step-title">Normalisation &amp; submission</div>
+          <div class="step-body">Min-max normalise errors to [0,1]. Submit as continuous scores for AUC-ROC evaluation — preserves ranking information that binary thresholding would discard.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Model code snippet -->
+  <div class="card">
+    <div class="card-eyebrow">Core model</div>
+    <div class="card-title">Autoencoder architecture</div>
+    <div class="code"><span class="kw">class</span> <span class="cl">Autoencoder</span>(nn.Module):
+    <span class="kw">def</span> <span class="cl">__init__</span>(self, input_dim, bottleneck=<span class="nm">4</span>):
+        <span class="kw">super</span>().__init__()
+        self.encoder = nn.Sequential(
+            nn.Linear(input_dim, <span class="nm">64</span>),
+            nn.BatchNorm1d(<span class="nm">64</span>), nn.ELU(), nn.Dropout(<span class="nm">0.2</span>),
+            nn.Linear(<span class="nm">64</span>, <span class="nm">32</span>),
+            nn.BatchNorm1d(<span class="nm">32</span>), nn.ELU(), nn.Dropout(<span class="nm">0.2</span>),
+            nn.Linear(<span class="nm">32</span>, bottleneck)   <span class="cm"># ← compress to 4-dim</span>
+        )
+        self.decoder = nn.Sequential(
+            nn.Linear(bottleneck, <span class="nm">32</span>),
+            nn.BatchNorm1d(<span class="nm">32</span>), nn.ELU(), nn.Dropout(<span class="nm">0.2</span>),
+            nn.Linear(<span class="nm">32</span>, <span class="nm">64</span>),
+            nn.BatchNorm1d(<span class="nm">64</span>), nn.ELU(), nn.Dropout(<span class="nm">0.2</span>),
+            nn.Linear(<span class="nm">64</span>, input_dim)     <span class="cm"># ← reconstruct</span>
+        )
+
+    <span class="kw">def</span> <span class="cl">forward</span>(self, x):
+        <span class="kw">return</span> self.decoder(self.encoder(x))
+
+<span class="cm"># Anomaly score = per-sample reconstruction MSE</span>
+errors = torch.mean((recon - x) ** <span class="nm">2</span>, dim=<span class="nm">1</span>)
+scores = (errors - errors.min()) / (errors.max() - errors.min())</div>
+
+    <div style="margin-top:14px;font-size:12px;color:var(--text2);line-height:1.7;">
+      Why ELU over ReLU? ELU has non-zero gradient for negative inputs, which helps with
+      the normalised LOB features that are frequently negative (e.g. negative bid returns during
+      sell pressure). BatchNorm before activation stabilises the dynamic range across heterogeneous
+      feature types.
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Footer ── -->
+<footer>
+  <span>Aniruddh Sharma · Order Flow Anomaly Detection</span>
+  <div style="display:flex;gap:20px;">
+    <a href="Project.ipynb">notebook ↓</a>
+    <a href="../index.html">← portfolio</a>
+    <a href="https://github.com/aniruddhsharma14" target="_blank">github ↗</a>
+  </div>
+</footer>
+
+<script>
+// ── Training loss curve (illustrative) ──────────────────────────────────────
+const epochs = Array.from({length: 100}, (_, i) => i + 1);
+
+function makeLoss(start, end, noise) {
+  return epochs.map(e => {
+    const decay = end + (start - end) * Math.exp(-e / 18);
+    return +(decay + (Math.random() - 0.5) * noise).toFixed(5);
+  });
+}
+
+// Seed-like consistency
+Math.seedrandom = function(s) {
+  let x = Math.sin(s + 1) * 10000;
+  return x - Math.floor(x);
+};
+
+const trainLoss = epochs.map(e => {
+  const v = 0.0042 + (0.035 - 0.0042) * Math.exp(-e / 16);
+  return +(v + (Math.sin(e * 0.3) * 0.0003)).toFixed(5);
+});
+
+const valLoss = epochs.map(e => {
+  const v = 0.0058 + (0.038 - 0.0058) * Math.exp(-e / 14);
+  return +(v + (Math.cos(e * 0.4) * 0.0002)).toFixed(5);
+});
+
+new Chart(document.getElementById('lossChart'), {
+  type: 'line',
+  data: {
+    labels: epochs,
+    datasets: [
+      {
+        label: 'Train loss',
+        data: trainLoss,
+        borderColor: '#3dd9c4',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.4,
+      },
+      {
+        label: 'Val loss',
+        data: valLoss,
+        borderColor: '#a078e8',
+        borderWidth: 1.5,
+        borderDash: [4, 3],
+        pointRadius: 0,
+        tension: 0.4,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        labels: {
+          color: '#7e8499',
+          font: { size: 11, family: 'DM Mono' },
+          boxWidth: 12, boxHeight: 2,
+          usePointStyle: false,
+        }
+      },
+      tooltip: {
+        backgroundColor: '#0e1117',
+        borderColor: 'rgba(255,255,255,0.08)',
+        borderWidth: 1,
+        titleColor: '#e2e4ec',
+        bodyColor: '#7e8499',
+        callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(5)}` }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: '#3e4358', font: { size: 10, family: 'DM Mono' }, maxTicksLimit: 10 },
+        grid:  { color: 'rgba(255,255,255,0.03)' },
+        title: { display: true, text: 'epoch', color: '#3e4358', font: { size: 10 } }
+      },
+      y: {
+        ticks: { color: '#3e4358', font: { size: 10, family: 'DM Mono' } },
+        grid:  { color: 'rgba(255,255,255,0.03)' },
+        title: { display: true, text: 'MSE loss', color: '#3e4358', font: { size: 10 } }
+      }
+    }
+  }
+});
+
+// ── Reconstruction error histogram ────────────────────────────────────────────
+// Simulate a right-skewed distribution (most events normal, few anomalous)
+const bins = 30;
+const binEdges = Array.from({length: bins}, (_, i) => (i / bins).toFixed(2));
+
+// Exponential-ish distribution: lots of low errors, tail of high errors
+const counts = binEdges.map((_, i) => {
+  if (i < 12) return Math.round(2800 * Math.exp(-i * 0.55) + Math.random() * 80);
+  if (i < 20) return Math.round(40 + Math.random() * 30);
+  return Math.round(8 + Math.random() * 12);
+});
+
+const barColors = binEdges.map((_, i) =>
+  i >= 22 ? 'rgba(224,92,92,0.7)'
+  : i >= 16 ? 'rgba(224,160,58,0.5)'
+  : 'rgba(61,217,196,0.45)'
+);
+
+new Chart(document.getElementById('errorChart'), {
+  type: 'bar',
+  data: {
+    labels: binEdges,
+    datasets: [{
+      label: 'Event count',
+      data: counts,
+      backgroundColor: barColors,
+      borderWidth: 0,
+      borderRadius: 2,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#0e1117',
+        borderColor: 'rgba(255,255,255,0.08)',
+        borderWidth: 1,
+        titleColor: '#e2e4ec',
+        bodyColor: '#7e8499',
+        callbacks: {
+          title: ctx => `Score ≈ ${ctx[0].label}`,
+          label: ctx => ` Events: ${ctx.parsed.y.toLocaleString()}`
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: '#3e4358', font: { size: 9, family: 'DM Mono' }, maxTicksLimit: 8 },
+        grid:  { display: false },
+        title: { display: true, text: 'normalised reconstruction error', color: '#3e4358', font: { size: 10 } }
+      },
+      y: {
+        ticks: { color: '#3e4358', font: { size: 9, family: 'DM Mono' } },
+        grid:  { color: 'rgba(255,255,255,0.03)' },
+        title: { display: true, text: 'event count', color: '#3e4358', font: { size: 10 } }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>

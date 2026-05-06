@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Twitter Engagement Strategy · Aniruddh Sharma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #f5f2ee;
+    --bg2:        #edeae4;
+    --bg3:        #e4e0d8;
+    --bg4:        #d8d3c8;
+    --border:     rgba(0,0,0,0.07);
+    --border2:    rgba(0,0,0,0.13);
+    --text:       #1a1714;
+    --text2:      #6b6455;
+    --text3:      #a89f92;
+    --twitter:    #1a8cd8;
+    --twitter-bg: rgba(26,140,216,0.08);
+    --twitter-mid:rgba(26,140,216,0.2);
+    --green:      #1a7a45;
+    --green-bg:   rgba(26,122,69,0.08);
+    --red:        #b53030;
+    --red-bg:     rgba(181,48,48,0.08);
+    --amber:      #b06b1a;
+    --amber-bg:   rgba(176,107,26,0.08);
+    --purple:     #6b3fa0;
+    --purple-bg:  rgba(107,63,160,0.08);
+    --radius:     8px;
+    --radius-lg:  14px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  /* ── Nav ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(245,242,238,0.9);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+    height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .nav-back {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text2);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: color 0.15s;
+  }
+
+  .nav-back:hover { color: var(--twitter); }
+
+  .nav-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(26,140,216,0.3);
+    color: var(--twitter);
+    background: var(--twitter-bg);
+  }
+
+  /* ── Hero ── */
+  .hero {
+    padding: 64px 48px 52px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: -100px; right: -80px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(26,140,216,0.05) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--twitter);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    width: 20px; height: 1px;
+    background: var(--twitter);
+    display: inline-block;
+  }
+
+  h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(28px, 4vw, 46px);
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+    max-width: 680px;
+  }
+
+  h1 em { font-style: italic; color: var(--twitter); }
+
+  .hero-sub {
+    font-size: 14px;
+    color: var(--text2);
+    max-width: 580px;
+    line-height: 1.8;
+    margin-bottom: 28px;
+  }
+
+  .pills { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    background: var(--bg2);
+  }
+
+  /* ── Metrics ── */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .metric {
+    padding: 26px 32px;
+    border-right: 1px solid var(--border);
+  }
+
+  .metric:last-child { border-right: none; }
+
+  .metric-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 8px;
+  }
+
+  .metric-val {
+    font-family: 'Instrument Serif', serif;
+    font-size: 34px;
+    font-weight: 400;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .c-blue   { color: var(--twitter); }
+  .c-green  { color: var(--green); }
+  .c-red    { color: var(--red); }
+  .c-amber  { color: var(--amber); }
+  .c-purple { color: var(--purple); }
+
+  .metric-sub { font-size: 11px; color: var(--text3); }
+
+  /* ── Main grid ── */
+  .main {
+    padding: 40px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 26px;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: var(--border2); }
+  .card.full  { grid-column: 1 / -1; }
+
+  .card-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 5px;
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  /* ── Pipeline steps ── */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+
+  .pipe-node {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 6px;
+    text-align: center;
+  }
+
+  .pipe-step {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+    margin-bottom: 3px;
+  }
+
+  .pipe-label {
+    font-size: 10px;
+    color: var(--text2);
+    line-height: 1.3;
+  }
+
+  .pipe-node.active {
+    background: var(--twitter-bg);
+    border-color: rgba(26,140,216,0.2);
+  }
+
+  .pipe-node.active .pipe-label { color: var(--twitter); }
+
+  /* ── Signal explanation ── */
+  .signal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .signal-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+  }
+
+  .signal-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .signal-formula {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--twitter);
+    background: var(--twitter-bg);
+    border-radius: 4px;
+    padding: 3px 8px;
+    display: inline-block;
+    margin-bottom: 6px;
+  }
+
+  .signal-desc {
+    font-size: 11px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+
+  /* ── Step list ── */
+  .step-list { display: flex; flex-direction: column; }
+
+  .step {
+    display: flex; gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+
+  .step:last-child { border-bottom: none; }
+
+  .step-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--twitter);
+    background: var(--twitter-bg);
+    border: 1px solid rgba(26,140,216,0.2);
+    border-radius: 4px;
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .step-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .step-body { font-size: 12px; color: var(--text2); line-height: 1.6; }
+
+  /* ── Callout ── */
+  .callout {
+    background: var(--twitter-bg);
+    border: 1px solid rgba(26,140,216,0.15);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  .callout strong { color: var(--twitter); font-weight: 500; }
+
+  .callout-green {
+    background: var(--green-bg);
+    border-color: rgba(26,122,69,0.15);
+  }
+  .callout-green strong { color: var(--green); }
+
+  /* ── Chart wrap ── */
+  .chart-wrap { position: relative; width: 100%; }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 22px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+  }
+
+  footer a {
+    color: var(--text2); text-decoration: none; transition: color 0.15s;
+  }
+  footer a:hover { color: var(--twitter); }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero    { animation: fadeUp 0.5s ease both; }
+  .metrics { animation: fadeUp 0.5s 0.08s ease both; }
+  .main    { animation: fadeUp 0.5s 0.14s ease both; }
+
+  /* ── Responsive ── */
+  @media (max-width: 860px) {
+    nav, .hero, footer { padding-left: 20px; padding-right: 20px; }
+    .metrics { grid-template-columns: repeat(2, 1fr); }
+    .metric:nth-child(2) { border-right: none; }
+    .main { grid-template-columns: 1fr; padding: 24px 20px; }
+    .card.full { grid-column: 1; }
+    .pipeline { grid-template-columns: repeat(4, 1fr); }
+    .signal-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" class="nav-back">← portfolio</a>
+  <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);">twitter-engagement-strategy</span>
+  <span class="nav-tag">long-only · monthly rebalance</span>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="hero-eyebrow">NLP · Quantitative equity strategy</div>
+  <h1>Trading on <em>Twitter engagement</em> — a sentiment-ranked equity strategy</h1>
+  <p class="hero-sub">
+    Ranks stocks monthly by their Twitter engagement ratio (comments ÷ likes), goes long the
+    top 5 highest-engagement names, rebalances at each month-end, and benchmarks cumulative
+    returns against QQQ. A clean test of whether retail social activity predicts near-term
+    price performance.
+  </p>
+  <div class="pills">
+    <span class="pill">Python</span>
+    <span class="pill">yfinance</span>
+    <span class="pill">pandas</span>
+    <span class="pill">Long-only</span>
+    <span class="pill">Monthly rebalancing</span>
+    <span class="pill">QQQ benchmark</span>
+    <span class="pill">2021–2023</span>
+  </div>
+</section>
+
+<!-- ── Metrics ── -->
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-label">Backtest period</div>
+    <div class="metric-val c-blue">2 yrs</div>
+    <div class="metric-sub">Jan 2021 – Mar 2023</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Portfolio size</div>
+    <div class="metric-val c-amber">Top 5</div>
+    <div class="metric-sub">stocks per month, equal-weighted</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Rebalance frequency</div>
+    <div class="metric-val c-purple">Monthly</div>
+    <div class="metric-sub">cross-sectional rank reset</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Benchmark</div>
+    <div class="metric-val c-blue">QQQ</div>
+    <div class="metric-sub">NASDAQ-100 ETF</div>
+  </div>
+</div>
+
+<!-- ── Main ── -->
+<div class="main">
+
+  <!-- Pipeline -->
+  <div class="card full">
+    <div class="card-eyebrow">Pipeline</div>
+    <div class="card-title">7-step strategy construction</div>
+    <div class="pipeline">
+      <div class="pipe-node active">
+        <div class="pipe-step">01</div>
+        <div class="pipe-label">Load Twitter sentiment data</div>
+      </div>
+      <div class="pipe-node active">
+        <div class="pipe-step">02</div>
+        <div class="pipe-label">Compute engagement ratio</div>
+      </div>
+      <div class="pipe-node active">
+        <div class="pipe-step">03</div>
+        <div class="pipe-label">Monthly average + cross-sectional rank</div>
+      </div>
+      <div class="pipe-node active">
+        <div class="pipe-step">04</div>
+        <div class="pipe-label">Select top 5 stocks per month</div>
+      </div>
+      <div class="pipe-node active">
+        <div class="pipe-step">05</div>
+        <div class="pipe-label">Download prices via yfinance</div>
+      </div>
+      <div class="pipe-node active">
+        <div class="pipe-step">06</div>
+        <div class="pipe-label">Equal-weight portfolio returns</div>
+      </div>
+      <div class="pipe-node active">
+        <div class="pipe-step">07</div>
+        <div class="pipe-label">Benchmark vs QQQ</div>
+      </div>
+    </div>
+    <p style="font-size:13px;color:var(--text2);line-height:1.75;max-width:780px;">
+      The signal construction respects look-ahead bias: sentiment ranks are computed on month-end data,
+      and the portfolio is shifted forward by one day (<code style="font-family:'DM Mono',monospace;font-size:11px;color:var(--twitter)">pd.DateOffset(1)</code>) so that the position
+      is only entered at the <em>start</em> of the following month — simulating realistic execution timing.
+    </p>
+  </div>
+
+  <!-- Signal definition -->
+  <div class="card">
+    <div class="card-eyebrow">Signal construction</div>
+    <div class="card-title">Engagement ratio as alpha signal</div>
+    <div class="signal-grid">
+      <div class="signal-card">
+        <div class="signal-name">Engagement ratio</div>
+        <div class="signal-formula">comments ÷ likes</div>
+        <div class="signal-desc">Higher ratio = more discussion relative to passive approval. Debate-heavy stocks tend to have higher near-term volatility and momentum.</div>
+      </div>
+      <div class="signal-card">
+        <div class="signal-name">Activity filter</div>
+        <div class="signal-formula">likes &gt; 20 AND comments &gt; 10</div>
+        <div class="signal-desc">Removes low-signal noise. Stocks with minimal Twitter presence get filtered before ranking to avoid rank instability from tiny denominators.</div>
+      </div>
+      <div class="signal-card">
+        <div class="signal-name">Monthly aggregation</div>
+        <div class="signal-formula">mean(engagement_ratio)</div>
+        <div class="signal-desc">Daily ratios averaged to monthly frequency to smooth out single-day spikes from earnings announcements or news events.</div>
+      </div>
+      <div class="signal-card">
+        <div class="signal-name">Cross-sectional rank</div>
+        <div class="signal-formula">rank(ascending=False)</div>
+        <div class="signal-desc">Each month, all stocks ranked against each other. Only rank 1–5 are held. This removes the level effect — the absolute ratio doesn't matter, only relative position.</div>
+      </div>
+    </div>
+    <div class="callout">
+      <strong>Why engagement ratio over raw sentiment score?</strong> Raw sentiment (positive/negative) is widely used and likely arbitraged. The comments-to-likes ratio is a contrarian proxy — high debate relative to endorsement often signals market disagreement, which can precede price moves.
+    </div>
+  </div>
+
+  <!-- Cumulative return chart -->
+  <div class="card">
+    <div class="card-eyebrow">Performance</div>
+    <div class="card-title">Cumulative returns vs QQQ (2021–2023)</div>
+    <div class="chart-wrap" style="height:240px;margin-bottom:16px;">
+      <canvas id="returnChart" role="img" aria-label="Line chart comparing cumulative returns of the Twitter engagement strategy versus QQQ from 2021 to 2023">Cumulative returns chart</canvas>
+    </div>
+    <div class="callout callout-green">
+      <strong>Note:</strong> Chart uses illustrative data reflecting the general 2021–2023 market environment (QQQ drawdown, growth stock volatility). Replace with your actual <code style="font-family:'DM Mono',monospace;font-size:11px;">portfolio_cumulative_return</code> output from the notebook.
+    </div>
+  </div>
+
+  <!-- Monthly return bar chart -->
+  <div class="card">
+    <div class="card-eyebrow">Monthly breakdown</div>
+    <div class="card-title">Strategy vs QQQ — monthly log returns</div>
+    <div class="chart-wrap" style="height:240px;margin-bottom:16px;">
+      <canvas id="monthlyChart" role="img" aria-label="Bar chart comparing monthly log returns of the strategy versus QQQ">Monthly returns chart</canvas>
+    </div>
+    <p style="font-size:12px;color:var(--text2);line-height:1.7;">
+      Equal-weighted portfolio of top-5 ranked stocks, rebalanced at month start.
+      Log returns computed as <code style="font-family:'DM Mono',monospace;font-size:11px;color:var(--twitter)">np.log(Adj Close).diff()</code> and averaged across holdings.
+    </p>
+  </div>
+
+  <!-- Methodology -->
+  <div class="card">
+    <div class="card-eyebrow">Methodology</div>
+    <div class="card-title">Design decisions</div>
+    <div class="step-list">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-title">No look-ahead bias</div>
+          <div class="step-body">Sentiment ranks computed on month-end, portfolio entered at month-start + 1 day via <code style="font-family:'DM Mono',monospace;font-size:10px;">DateOffset(1)</code>. Rank information is never used on the same day it's available.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-title">Engagement over raw sentiment</div>
+          <div class="step-body">Comments ÷ likes captures the ratio of active discussion to passive approval — a less crowded signal than NLP-based positive/negative scoring which is widely used and potentially arbitraged.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-title">Cross-sectional ranking</div>
+          <div class="step-body">Stocks ranked against each other each month rather than against their own history. Removes time-series drift in engagement levels — only relative engagement matters for selection.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <div class="step-title">Log returns for compounding</div>
+          <div class="step-body"><code style="font-family:'DM Mono',monospace;font-size:10px;">np.log(Adj Close).diff()</code> for returns, <code style="font-family:'DM Mono',monospace;font-size:10px;">np.exp(np.log1p(r).cumsum()) - 1</code> for cumulative. Log returns are additive across time, preventing compounding distortions in the backtest.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div>
+          <div class="step-title">QQQ as benchmark</div>
+          <div class="step-body">NASDAQ-100 ETF chosen because Twitter engagement data skews toward high-growth tech and consumer names — the same universe QQQ captures. S&P 500 would create a sector mismatch.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Limitations -->
+  <div class="card">
+    <div class="card-eyebrow">Honest limitations</div>
+    <div class="card-title">What this doesn't account for</div>
+    <div class="step-list">
+      <div class="step">
+        <div class="step-num">!</div>
+        <div>
+          <div class="step-title">Transaction costs</div>
+          <div class="step-body">Monthly rebalancing across 5 stocks incurs real bid-ask spread and commission costs. A realistic implementation would need to net these against gross returns, especially for smaller positions.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">!</div>
+        <div>
+          <div class="step-title">Survivorship bias</div>
+          <div class="step-body">Stocks that were delisted or went bankrupt during 2021–2023 may not appear in the dataset. This could overstate returns if the worst performers are excluded.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">!</div>
+        <div>
+          <div class="step-title">Short backtest window</div>
+          <div class="step-body">2 years (2021–2023) covers one bull and one bear regime. The strategy hasn't been tested across a full market cycle — results may not generalise.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">!</div>
+        <div>
+          <div class="step-title">Concentration risk</div>
+          <div class="step-body">Holding only 5 equal-weighted names means idiosyncratic events in a single stock have outsized impact. A production version would need position sizing and risk limits.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>Aniruddh Sharma · Twitter Engagement Strategy · 2021–2023</span>
+  <div style="display:flex;gap:20px;">
+    <a href="Twitter_Sentiment_Analysis.ipynb">notebook ↓</a>
+    <a href="../index.html">← portfolio</a>
+    <a href="https://github.com/aniruddhsharma14" target="_blank">github ↗</a>
+  </div>
+</footer>
+
+<script>
+// ── Cumulative return chart ───────────────────────────────────────────────────
+const months = [
+  'Jan 21','Feb 21','Mar 21','Apr 21','May 21','Jun 21',
+  'Jul 21','Aug 21','Sep 21','Oct 21','Nov 21','Dec 21',
+  'Jan 22','Feb 22','Mar 22','Apr 22','May 22','Jun 22',
+  'Jul 22','Aug 22','Sep 22','Oct 22','Nov 22','Dec 22',
+  'Jan 23','Feb 23','Mar 23'
+];
+
+// Illustrative data: strategy slightly outperforms in 2021 bull run,
+// both fall in 2022 bear, strategy slightly worse drawdown
+function cumulate(monthlyReturns) {
+  let cum = [0];
+  monthlyReturns.forEach(r => cum.push(cum[cum.length - 1] + r));
+  return cum.slice(1).map(v => parseFloat((Math.exp(v) - 1).toFixed(4)));
+}
+
+const stratReturns = [
+  0.08, 0.03, 0.05, 0.06, -0.02, 0.07,
+  0.04, 0.05, -0.04, 0.08, -0.06, 0.04,
+  -0.09, -0.05, 0.02, -0.12, -0.08, -0.07,
+  0.06, -0.03, -0.08, 0.05, 0.04, -0.02,
+  0.07, -0.01, 0.05
+];
+
+const qqqReturns = [
+  0.07, 0.01, 0.01, 0.06, -0.01, 0.07,
+  0.02, 0.04, -0.05, 0.07, -0.04, 0.02,
+  -0.09, -0.05, 0.03, -0.13, -0.01, -0.09,
+  0.12, -0.01, -0.10, 0.04, 0.05, -0.01,
+  0.10, -0.01, 0.02
+];
+
+new Chart(document.getElementById('returnChart'), {
+  type: 'line',
+  data: {
+    labels: months,
+    datasets: [
+      {
+        label: 'Twitter engagement strategy',
+        data: cumulate(stratReturns),
+        borderColor: '#1a8cd8',
+        borderWidth: 2,
+        pointRadius: 0,
+        tension: 0.35,
+        fill: false,
+      },
+      {
+        label: 'QQQ (benchmark)',
+        data: cumulate(qqqReturns),
+        borderColor: '#a89f92',
+        borderWidth: 1.5,
+        borderDash: [5, 4],
+        pointRadius: 0,
+        tension: 0.35,
+        fill: false,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        labels: {
+          color: '#6b6455',
+          font: { size: 11, family: 'DM Mono' },
+          boxWidth: 14, boxHeight: 2,
+        }
+      },
+      tooltip: {
+        backgroundColor: '#fff',
+        borderColor: 'rgba(0,0,0,0.1)',
+        borderWidth: 1,
+        titleColor: '#1a1714',
+        bodyColor: '#6b6455',
+        callbacks: {
+          label: ctx => ` ${ctx.dataset.label}: ${(ctx.parsed.y * 100).toFixed(1)}%`
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: '#a89f92', font: { size: 9, family: 'DM Mono' }, maxTicksLimit: 9 },
+        grid: { color: 'rgba(0,0,0,0.04)' }
+      },
+      y: {
+        ticks: {
+          color: '#a89f92',
+          font: { size: 9, family: 'DM Mono' },
+          callback: v => (v * 100).toFixed(0) + '%'
+        },
+        grid: { color: 'rgba(0,0,0,0.04)' },
+        title: { display: true, text: 'cumulative return', color: '#a89f92', font: { size: 10 } }
+      }
+    }
+  }
+});
+
+// ── Monthly bar chart ─────────────────────────────────────────────────────────
+const shortMonths = months.map(m => m.split(' ')[0] + "'" + m.split(' ')[1].slice(2));
+
+new Chart(document.getElementById('monthlyChart'), {
+  type: 'bar',
+  data: {
+    labels: shortMonths,
+    datasets: [
+      {
+        label: 'Strategy',
+        data: stratReturns.map(v => parseFloat((v * 100).toFixed(2))),
+        backgroundColor: stratReturns.map(v => v >= 0 ? 'rgba(26,122,69,0.55)' : 'rgba(181,48,48,0.5)'),
+        borderWidth: 0,
+        borderRadius: 2,
+      },
+      {
+        label: 'QQQ',
+        data: qqqReturns.map(v => parseFloat((v * 100).toFixed(2))),
+        backgroundColor: 'rgba(168,159,146,0.35)',
+        borderWidth: 0,
+        borderRadius: 2,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        labels: {
+          color: '#6b6455',
+          font: { size: 11, family: 'DM Mono' },
+          boxWidth: 12, boxHeight: 8,
+        }
+      },
+      tooltip: {
+        backgroundColor: '#fff',
+        borderColor: 'rgba(0,0,0,0.1)',
+        borderWidth: 1,
+        titleColor: '#1a1714',
+        bodyColor: '#6b6455',
+        callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%` }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: '#a89f92', font: { size: 8, family: 'DM Mono' }, maxTicksLimit: 14 },
+        grid: { display: false }
+      },
+      y: {
+        ticks: {
+          color: '#a89f92',
+          font: { size: 9, family: 'DM Mono' },
+          callback: v => v + '%'
+        },
+        grid: { color: 'rgba(0,0,0,0.04)' }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
